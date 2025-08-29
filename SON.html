@@ -47,7 +47,7 @@
         .logo {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
             border-radius: 20px;
             margin: 0 auto 20px;
             display: flex;
@@ -213,12 +213,12 @@
 <body>
     <div class="app-container">
         <div class="login-screen" id="loginScreen">
-            <div class="logo">AC</div>
-            <h1 class="app-title">엔젤코인</h1>
-            <p class="app-subtitle">비밀계좌</p>
+            <div class="logo" id="appLogo">♡</div>
+            <h1 class="app-title" id="appTitle">사랑의날개</h1>
+            <p class="app-subtitle" id="appSubtitle">커뮤니티 플랫폼</p>
             
             <div class="input-container">
-                <label class="input-label" for="codeInput">접근 코드 (7자리)</label>
+                <label class="input-label" for="codeInput">회원 인증 코드</label>
                 <input 
                     type="text" 
                     id="codeInput" 
@@ -228,16 +228,16 @@
                     autocomplete="off"
                 >
                 <div class="error-message" id="errorMessage">
-                    🚫 접근이 거부되었습니다. 올바른 코드를 입력해주세요.
+                    🚫 인증에 실패했습니다. 올바른 코드를 입력해주세요.
                 </div>
             </div>
             
-            <button class="login-btn" id="loginBtn">로그인</button>
+            <button class="login-btn" id="loginBtn">인증하기</button>
         </div>
 
         <div class="success-screen" id="successScreen">
             <div class="success-icon">✓</div>
-            <h2 class="success-title">접근 성공!</h2>
+            <h2 class="success-title">시스템 접근 성공!</h2>
             <div class="success-message">
                 엔딩 조건 중 하나 달성,<br>
                 <strong>손대웅의 비밀 계좌가 발견되었다.</strong>
@@ -251,6 +251,9 @@
         const errorMessage = document.getElementById('errorMessage');
         const loginScreen = document.getElementById('loginScreen');
         const successScreen = document.getElementById('successScreen');
+        const appLogo = document.getElementById('appLogo');
+        const appTitle = document.getElementById('appTitle');
+        const appSubtitle = document.getElementById('appSubtitle');
         
         const correctCode = 'VINCENT';
         
@@ -267,15 +270,43 @@
             }, 3000);
         }
         
+        function revealTrueIdentity() {
+            // 로고와 타이틀을 서서히 변경
+            appLogo.style.transition = 'all 0.5s ease';
+            appTitle.style.transition = 'all 0.5s ease';
+            appSubtitle.style.transition = 'all 0.5s ease';
+            
+            // 페이드 아웃
+            appLogo.style.opacity = '0';
+            appTitle.style.opacity = '0';
+            appSubtitle.style.opacity = '0';
+            
+            setTimeout(() => {
+                // 내용 변경
+                appLogo.textContent = 'AC';
+                appLogo.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+                appTitle.textContent = '엔젤코인';
+                appSubtitle.textContent = '비밀계좌';
+                
+                // 페이드 인
+                appLogo.style.opacity = '1';
+                appTitle.style.opacity = '1';
+                appSubtitle.style.opacity = '1';
+            }, 250);
+        }
+        
         function showSuccess() {
-            loginScreen.classList.add('hide');
-            successScreen.classList.add('show');
+            setTimeout(() => {
+                loginScreen.classList.add('hide');
+                successScreen.classList.add('show');
+            }, 1000);
         }
         
         function attemptLogin() {
             const inputCode = codeInput.value.trim().toUpperCase();
             
             if (inputCode === correctCode) {
+                revealTrueIdentity();
                 showSuccess();
             } else {
                 showError();
