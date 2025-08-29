@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>주식 투자 게임 (2010-2015)</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .game-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        
+        .game-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        
+        .game-status {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .year-display {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #4a90e2;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .stocks-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stock-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stock-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stock-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .stock-price {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #27ae60;
+        }
+        
+        .price-change {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+        
+        .price-up { color: #e74c3c; }
+        .price-down { color: #3498db; }
+        
+        .teams-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .teams-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px;
+        }
+        
+        .team-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #e9ecef;
+        }
+        
+        .team-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 10px;
+        }
+        
+        .team-money {
+            font-size: 1.1em;
+            color: #28a745;
+            font-weight: bold;
+        }
+        
+        .team-stocks {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #6c757d;
+        }
+        
+        .controls-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .control-group {
+            margin-bottom: 15px;
+        }
+        
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .control-group input, .control-group select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        
+        .control-group input:focus, .control-group select:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+        
+        .buttons-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: #4a90e2;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #357abd;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+        }
+        
+        .rumors-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .rumor-card {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .rumor-title {
+            font-weight: bold;
+            color: #856404;
+            margin-bottom: 5px;
+        }
+        
+        .rumor-content {
+            color: #856404;
+        }
+        
+        .rumor-price {
+            color: #dc3545;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .setup-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .message {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+        }
+        
+        .message-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .message-error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="game-header">
+            <h1>📈 주식 투자 게임 📈</h1>
+            <p>2010년부터 2015년까지의 주식 투자 시뮬레이션 게임</p>
+        </div>
+        
+        <!-- 게임 설정 섹션 -->
+        <div class="setup-section" id="setupSection">
+            <h2>🎮 게임 설정</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div class="control-group">
+                    <label for="moneyA">A팀 초기 자금 (원):</label>
+                    <input type="number" id="moneyA" value="3000000" min="1000000" step="500000">
+                </div>
+                <div class="control-group">
+                    <label for="moneyB">B팀 초기 자금 (원):</label>
+                    <input type="number" id="moneyB" value="2000000" min="1000000" step="500000">
+                </div>
+                <div class="control-group">
+                    <label for="moneyC">C팀 초기 자금 (원):</label>
+                    <input type="number" id="moneyC" value="5000000" min="1000000" step="500000">
+                </div>
+                <div class="control-group">
+                    <label for="moneyD">D팀 초기 자금 (원):</label>
+                    <input type="number" id="moneyD" value="1500000" min="1000000" step="500000">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="startGame()">게임 시작</button>
+        </div>
+        
+        <!-- 게임 진행 섹션 -->
+        <div id="gameSection" class="hidden">
+            <div class="game-status">
+                <div class="year-display" id="currentYear">2009년 - 초기 주가</div>
+                
+                <div class="stocks-grid" id="stocksGrid">
+                    <!-- 주식 정보가 여기에 표시됩니다 -->
+                </div>
+            </div>
+            
+            <div class="teams-section">
+                <h3>💰 팀별 현황</h3>
+                <div class="teams-grid" id="teamsGrid">
+                    <!-- 팀 정보가 여기에 표시됩니다 -->
+                </div>
+            </div>
+            
+            <div class="controls-section" id="gameControls">
+                <h3>🎯 게임 조작</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div class="control-group">
+                        <label for="teamSelect">팀 선택:</label>
+                        <select id="teamSelect">
+                            <option value="A">A팀</option>
+                            <option value="B">B팀</option>
+                            <option value="C">C팀</option>
+                            <option value="D">D팀</option>
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="stockSelect">회사 선택:</label>
+                        <select id="stockSelect">
+                            <!-- 주식 옵션이 여기에 표시됩니다 -->
+                        </select>
+                    </div>
+                    <div class="control-group">
+                        <label for="quantity">수량:</label>
+                        <input type="number" id="quantity" min="1" value="1">
+                    </div>
+                </div>
+                
+                <div class="buttons-row">
+                    <button class="btn btn-success" onclick="buyStock()">📈 주식 구매</button>
+                    <button class="btn btn-danger" onclick="sellStock()">📉 주식 매도</button>
+                    <button class="btn btn-warning" onclick="buyRumor()">📰 찌라시 구입</button>
+                    <button class="btn btn-primary" onclick="nextTurn()">⏭️ 다음 턴</button>
+                </div>
+                
+                <div id="messages"></div>
+            </div>
+            
+            <div class="rumors-section" id="rumorsSection" style="display: none;">
+                <h3>📰 찌라시 정보</h3>
+                <p>찌라시는 게임 마스터가 종이로 직접 제공합니다.</p>
+                <p>찌라시 구입 비용: 200,000원</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 게임 데이터
+        const companies = [
+            '신양전자', '노릉제약', '주연건설', 
+            '한국철강', '대성화학', '미래바이오'
+        ];
+        
+        const initialPrices = {
+            '신양전자': 120000,
+            '노릉제약': 150000,
+            '주연건설': 100000,
+            '한국철강': 130000,
+            '대성화학': 110000,
+            '미래바이오': 140000
+        };
+        
+        // 찌라시 효과 데이터 (호재: true, 악재: false)
+        const rumorEffects = {
+            2010: {
+                '신양전자': true,   // 호재
+                '노릉제약': true,   // 호재
+                '주연건설': false,  // 악재
+                '한국철강': true,   // 호재
+                '대성화학': false,  // 악재
+                '미래바이오': true  // 호재
+            },
+            2011: {
+                '신양전자': false,  // 악재
+                '노릉제약': false,  // 악재
+                '주연건설': true,   // 호재
+                '한국철강': false,  // 악재
+                '대성화학': true,   // 호재
+                '미래바이오': false // 악재
+            },
+            2012: {
+                '신양전자': true,   // 호재
+                '노릉제약': true,   // 호재
+                '주연건설': false,  // 악재
+                '한국철강': true,   // 호재
+                '대성화학': false,  // 악재
+                '미래바이오': true  // 호재
+            },
+            2013: {
+                '신양전자': false,  // 악재
+                '노릉제약': false,  // 악재
+                '주연건설': true,   // 호재
+                '한국철강': false,  // 악재
+                '대성화학': true,   // 호재
+                '미래바이오': false // 악재
+            },
+            2014: {
+                '신양전자': true,   // 호재
+                '노릉제약': true,   // 호재
+                '주연건설': false,  // 악재
+                '한국철강': true,   // 호재
+                '대성화학': false,  // 악재
+                '미래바이오': true  // 호재
+            },
+            2015: {
+                '신양전자': false,  // 악재
+                '노릉제약': false,  // 악재
+                '주연건설': true,   // 호재
+                '한국철강': false,  // 악재
+                '대성화학': true,   // 호재
+                '미래바이오': false // 악재
+            }
+        };
+        
+        let gameState = {
+            currentYear: 2009,
+            currentPrices: {...initialPrices},
+            teams: {
+                A: { money: 0, stocks: {} },
+                B: { money: 0, stocks: {} },
+                C: { money: 0, stocks: {} },
+                D: { money: 0, stocks: {} }
+            },
+            rumoredCompanies: []
+        };
+        
+        function startGame() {
+            // 팀별로 다른 초기 자금 설정
+            gameState.teams.A.money = parseInt(document.getElementById('moneyA').value);
+            gameState.teams.B.money = parseInt(document.getElementById('moneyB').value);
+            gameState.teams.C.money = parseInt(document.getElementById('moneyC').value);
+            gameState.teams.D.money = parseInt(document.getElementById('moneyD').value);
+            
+            // 초기 주식 보유량 설정
+            for (let team in gameState.teams) {
+                gameState.teams[team].stocks = {};
+                companies.forEach(company => {
+                    gameState.teams[team].stocks[company] = 0;
+                });
+            }
+            
+            document.getElementById('setupSection').classList.add('hidden');
+            document.getElementById('gameSection').classList.remove('hidden');
+            
+            updateDisplay();
+            populateStockSelect();
+        }
+        
+        function populateStockSelect() {
+            const stockSelect = document.getElementById('stockSelect');
+            stockSelect.innerHTML = '';
+            companies.forEach(company => {
+                const option = document.createElement('option');
+                option.value = company;
+                option.textContent = company;
+                stockSelect.appendChild(option);
+            });
+        }
+        
+        function updateDisplay() {
+            // 연도 표시
+            const yearText = gameState.currentYear === 2009 ? '2009년 - 초기 주가' : `${gameState.currentYear}년`;
+            document.getElementById('currentYear').textContent = yearText;
+            
+            // 주식 정보 표시
+            const stocksGrid = document.getElementById('stocksGrid');
+            stocksGrid.innerHTML = '';
+            
+            companies.forEach(company => {
+                const stockCard = document.createElement('div');
+                stockCard.className = 'stock-card';
+                
+                const currentPrice = gameState.currentPrices[company];
+                const initialPrice = initialPrices[company];
+                const changePercent = ((currentPrice - initialPrice) / initialPrice * 100).toFixed(1);
+                const changeClass = changePercent >= 0 ? 'price-up' : 'price-down';
+                
+                stockCard.innerHTML = `
+                    <div class="stock-name">${company}</div>
+                    <div class="stock-price">${currentPrice.toLocaleString()}원</div>
+                    <div class="price-change ${changeClass}">
+                        ${changePercent >= 0 ? '+' : ''}${changePercent}%
+                    </div>
+                `;
+                stocksGrid.appendChild(stockCard);
+            });
+            
+            // 팀 정보 표시
+            const teamsGrid = document.getElementById('teamsGrid');
+            teamsGrid.innerHTML = '';
+            
+            for (let teamName in gameState.teams) {
+                const team = gameState.teams[teamName];
+                const teamCard = document.createElement('div');
+                teamCard.className = 'team-card';
+                
+                // 보유 주식 가치 계산
+                let stockValue = 0;
+                let stockInfo = [];
+                companies.forEach(company => {
+                    const quantity = team.stocks[company] || 0;
+                    if (quantity > 0) {
+                        const value = quantity * gameState.currentPrices[company];
+                        stockValue += value;
+                        stockInfo.push(`${company}: ${quantity}주`);
+                    }
+                });
+                
+                const totalValue = team.money + stockValue;
+                
+                teamCard.innerHTML = `
+                    <div class="team-name">${teamName}팀</div>
+                    <div class="team-money">현금: ${team.money.toLocaleString()}원</div>
+                    <div class="team-money">주식가치: ${stockValue.toLocaleString()}원</div>
+                    <div class="team-money" style="border-top: 1px solid #dee2e6; padding-top: 10px; margin-top: 10px;">
+                        총 자산: ${totalValue.toLocaleString()}원
+                    </div>
+                    <div class="team-stocks">
+                        ${stockInfo.length > 0 ? stockInfo.join('<br>') : '보유 주식 없음'}
+                    </div>
+                `;
+                teamsGrid.appendChild(teamCard);
+            }
+        }
+        
+        function buyStock() {
+            const team = document.getElementById('teamSelect').value;
+            const company = document.getElementById('stockSelect').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            
+            if (!quantity || quantity <= 0) {
+                showMessage('올바른 수량을 입력하세요.', 'error');
+                return;
+            }
+            
+            const totalCost = quantity * gameState.currentPrices[company];
+            
+            if (gameState.teams[team].money < totalCost) {
+                showMessage('자금이 부족합니다.', 'error');
+                return;
+            }
+            
+            gameState.teams[team].money -= totalCost;
+            gameState.teams[team].stocks[company] = (gameState.teams[team].stocks[company] || 0) + quantity;
+            
+            showMessage(`${team}팀이 ${company} 주식 ${quantity}주를 ${totalCost.toLocaleString()}원에 구매했습니다.`, 'success');
+            updateDisplay();
+        }
+        
+        function sellStock() {
+            const team = document.getElementById('teamSelect').value;
+            const company = document.getElementById('stockSelect').value;
+            const quantity = parseInt(document.getElementById('quantity').value);
+            
+            if (!quantity || quantity <= 0) {
+                showMessage('올바른 수량을 입력하세요.', 'error');
+                return;
+            }
+            
+            const currentHolding = gameState.teams[team].stocks[company] || 0;
+            
+            if (currentHolding < quantity) {
+                showMessage('보유 주식이 부족합니다.', 'error');
+                return;
+            }
+            
+            const totalRevenue = quantity * gameState.currentPrices[company];
+            
+            gameState.teams[team].money += totalRevenue;
+            gameState.teams[team].stocks[company] -= quantity;
+            
+            showMessage(`${team}팀이 ${company} 주식 ${quantity}주를 ${totalRevenue.toLocaleString()}원에 매도했습니다.`, 'success');
+            updateDisplay();
+        }
+        
+        function buyRumor() {
+            const team = document.getElementById('teamSelect').value;
+            const rumorCost = 200000;
+            
+            if (gameState.teams[team].money < rumorCost) {
+                showMessage('찌라시 구입 자금이 부족합니다.', 'error');
+                return;
+            }
+            
+            gameState.teams[team].money -= rumorCost;
+            showMessage(`${team}팀이 찌라시를 구입했습니다. (-200,000원)`, 'success');
+            updateDisplay();
+        }
+        
+        function nextTurn() {
+            if (gameState.currentYear >= 2015) {
+                endGame();
+                return;
+            }
+            
+            if (gameState.currentYear === 2009) {
+                gameState.currentYear = 2010;
+            } else {
+                // 주가 변동 적용
+                applyPriceChanges();
+                gameState.currentYear++;
+            }
+            
+            updateDisplay();
+            document.getElementById('rumorsSection').style.display = 'none';
+        }
+        
+        function applyPriceChanges() {
+            // 각 회사의 찌라시 효과 적용
+            companies.forEach(company => {
+                const isPositive = rumorEffects[gameState.currentYear][company];
+                const oldPrice = gameState.currentPrices[company];
+                
+                let changePercent;
+                if (isPositive) {
+                    // 호재: +15% ~ +35% 범위
+                    changePercent = 15 + Math.random() * 20;  // 15~35%
+                } else {
+                    // 악재: -10% ~ -30% 범위
+                    changePercent = -(10 + Math.random() * 20);  // -10~-30%
+                }
+                
+                const newPrice = Math.round(oldPrice * (1 + changePercent / 100));
+                gameState.currentPrices[company] = newPrice;
+                
+                const changeText = changePercent > 0 ? `+${changePercent.toFixed(1)}` : changePercent.toFixed(1);
+                const effectType = isPositive ? '📈 호재' : '📉 악재';
+                
+                showMessage(`${company}: ${oldPrice.toLocaleString()}원 → ${newPrice.toLocaleString()}원 (${changeText}%) ${effectType}`, 'success');
+            });
+        }
+        
+        function endGame() {
+            // 최종 순위 계산
+            const finalRankings = [];
+            
+            for (let teamName in gameState.teams) {
+                const team = gameState.teams[teamName];
+                let totalValue = team.money;
+                
+                companies.forEach(company => {
+                    const quantity = team.stocks[company] || 0;
+                    totalValue += quantity * gameState.currentPrices[company];
+                });
+                
+                finalRankings.push({
+                    team: teamName,
+                    totalValue: totalValue,
+                    cash: team.money
+                });
+            }
+            
+            finalRankings.sort((a, b) => b.totalValue - a.totalValue);
+            
+            let resultMessage = '🎉 게임 종료! 최종 순위 🎉\n\n';
+            finalRankings.forEach((ranking, index) => {
+                resultMessage += `${index + 1}위: ${ranking.team}팀 - ${ranking.totalValue.toLocaleString()}원\n`;
+            });
+            
+            alert(resultMessage);
+            
+            // 게임 컨트롤 비활성화
+            document.getElementById('gameControls').style.display = 'none';
+        }
+        
+        function showMessage(message, type) {
+            const messagesDiv = document.getElementById('messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${type}`;
+            messageDiv.textContent = message;
+            
+            messagesDiv.appendChild(messageDiv);
+            
+            // 5초 후 메시지 제거
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+            
+            // 최대 5개 메시지만 유지
+            while (messagesDiv.children.length > 5) {
+                messagesDiv.removeChild(messagesDiv.firstChild);
+            }
+        }
+        
+        // 초기 화면 설정
+        updateDisplay();
+    </script>
+</body>
+</html>
