@@ -370,7 +370,7 @@
             <div class="rumors-section" id="rumorsSection" style="display: none;">
                 <h3>📰 찌라시 정보</h3>
                 <p>찌라시는 게임 마스터가 종이로 직접 제공합니다.</p>
-                <p>찌라시 구입 비용: 200,000원</p>
+                <p>찌라시 구입 비용: 300,000원</p>
             </div>
         </div>
     </div>
@@ -391,61 +391,62 @@
             '미래바이오': 140000
         };
         
-        // 찌라시 효과 데이터 (호재: true, 악재: false)
+        // 찌라시 효과 데이터 (정확한 변동률)
         const rumorEffects = {
             2010: {
-                '신양전자': true,   // 호재
-                '노릉제약': true,   // 호재
-                '주연건설': false,  // 악재
-                '한국철강': true,   // 호재
-                '대성화학': false,  // 악재
-                '미래바이오': true  // 호재
+                '신양전자': 25,    // +25%
+                '노릉제약': 30,    // +30%
+                '주연건설': -15,   // -15%
+                '한국철강': 20,    // +20%
+                '대성화학': -20,   // -20%
+                '미래바이오': 35   // +35%
             },
             2011: {
-                '신양전자': false,  // 악재
-                '노릉제약': false,  // 악재
-                '주연건설': true,   // 호재
-                '한국철강': false,  // 악재
-                '대성화학': true,   // 호재
-                '미래바이오': false // 악재
+                '신양전자': -15,   // -15%
+                '노릉제약': -25,   // -25%
+                '주연건설': 20,    // +20%
+                '한국철강': -18,   // -18%
+                '대성화학': 25,    // +25%
+                '미래바이오': -22  // -22%
             },
             2012: {
-                '신양전자': true,   // 호재
-                '노릉제약': true,   // 호재
-                '주연건설': false,  // 악재
-                '한국철강': true,   // 호재
-                '대성화학': false,  // 악재
-                '미래바이오': true  // 호재
+                '신양전자': 22,    // +22%
+                '노릉제약': 28,    // +28%
+                '주연건설': -18,   // -18%
+                '한국철강': 18,    // +18%
+                '대성화학': -25,   // -25%
+                '미래바이오': 40   // +40%
             },
             2013: {
-                '신양전자': false,  // 악재
-                '노릉제약': false,  // 악재
-                '주연건설': true,   // 호재
-                '한국철강': false,  // 악재
-                '대성화학': true,   // 호재
-                '미래바이오': false // 악재
+                '신양전자': -20,   // -20%
+                '노릉제약': -25,   // -25%
+                '주연건설': 28,    // +28%
+                '한국철강': -15,   // -15%
+                '대성화학': 30,    // +30%
+                '미래바이오': -35  // -35%
             },
             2014: {
-                '신양전자': true,   // 호재
-                '노릉제약': true,   // 호재
-                '주연건설': false,  // 악재
-                '한국철강': true,   // 호재
-                '대성화학': false,  // 악재
-                '미래바이오': true  // 호재
+                '신양전자': 25,    // +25%
+                '노릉제약': 22,    // +22%
+                '주연건설': -20,   // -20%
+                '한국철강': 18,    // +18%
+                '대성화학': -18,   // -18%
+                '미래바이오': 35   // +35%
             },
             2015: {
-                '신양전자': false,  // 악재
-                '노릉제약': false,  // 악재
-                '주연건설': true,   // 호재
-                '한국철강': false,  // 악재
-                '대성화학': true,   // 호재
-                '미래바이오': false // 악재
+                '신양전자': -18,   // -18%
+                '노릉제약': -22,   // -22%
+                '주연건설': 25,    // +25%
+                '한국철강': -15,   // -15%
+                '대성화학': 28,    // +28%
+                '미래바이오': -30  // -30%
             }
         };
         
         let gameState = {
             currentYear: 2009,
             currentPrices: {...initialPrices},
+            previousPrices: {...initialPrices}, // 전년도 가격 저장
             teams: {
                 A: { money: 0, stocks: {} },
                 B: { money: 0, stocks: {} },
@@ -462,13 +463,16 @@
             gameState.teams.C.money = parseInt(document.getElementById('moneyC').value);
             gameState.teams.D.money = parseInt(document.getElementById('moneyD').value);
             
-            // 초기 주식 보유량 설정
+            // 초기 주식 보유량 및 전년도 가격 설정
             for (let team in gameState.teams) {
                 gameState.teams[team].stocks = {};
                 companies.forEach(company => {
                     gameState.teams[team].stocks[company] = 0;
                 });
             }
+            
+            // 전년도 가격을 초기 가격으로 설정
+            gameState.previousPrices = {...initialPrices};
             
             document.getElementById('setupSection').classList.add('hidden');
             document.getElementById('gameSection').classList.remove('hidden');
@@ -502,15 +506,25 @@
                 stockCard.className = 'stock-card';
                 
                 const currentPrice = gameState.currentPrices[company];
-                const initialPrice = initialPrices[company];
-                const changePercent = ((currentPrice - initialPrice) / initialPrice * 100).toFixed(1);
-                const changeClass = changePercent >= 0 ? 'price-up' : 'price-down';
+                const previousPrice = gameState.previousPrices[company];
+                
+                let changeText = '';
+                let changeClass = '';
+                
+                if (gameState.currentYear > 2009) {
+                    const changePercent = ((currentPrice - previousPrice) / previousPrice * 100).toFixed(1);
+                    changeClass = changePercent >= 0 ? 'price-up' : 'price-down';
+                    changeText = `전년 대비: ${changePercent >= 0 ? '+' : ''}${changePercent}%`;
+                } else {
+                    changeText = '초기 주가';
+                    changeClass = '';
+                }
                 
                 stockCard.innerHTML = `
                     <div class="stock-name">${company}</div>
                     <div class="stock-price">${currentPrice.toLocaleString()}원</div>
                     <div class="price-change ${changeClass}">
-                        ${changePercent >= 0 ? '+' : ''}${changePercent}%
+                        ${changeText}
                     </div>
                 `;
                 stocksGrid.appendChild(stockCard);
@@ -624,12 +638,16 @@
                 return;
             }
             
+            // 다음 연도로 이동
             if (gameState.currentYear === 2009) {
                 gameState.currentYear = 2010;
             } else {
-                // 주가 변동 적용
-                applyPriceChanges();
                 gameState.currentYear++;
+            }
+            
+            // 2010년부터 주가 변동 적용
+            if (gameState.currentYear >= 2010) {
+                applyPriceChanges();
             }
             
             updateDisplay();
@@ -637,27 +655,22 @@
         }
         
         function applyPriceChanges() {
+            // 전년도 가격 저장
+            gameState.previousPrices = {...gameState.currentPrices};
+            
             // 각 회사의 찌라시 효과 적용
             companies.forEach(company => {
-                const isPositive = rumorEffects[gameState.currentYear][company];
+                const changePercent = rumorEffects[gameState.currentYear][company];
                 const oldPrice = gameState.currentPrices[company];
                 
-                let changePercent;
-                if (isPositive) {
-                    // 호재: +15% ~ +35% 범위
-                    changePercent = 15 + Math.random() * 20;  // 15~35%
-                } else {
-                    // 악재: -10% ~ -30% 범위
-                    changePercent = -(10 + Math.random() * 20);  // -10~-30%
-                }
-                
                 const newPrice = Math.round(oldPrice * (1 + changePercent / 100));
-                gameState.currentPrices[company] = newPrice;
+                // 음수가 되지 않도록 최소값 설정
+                gameState.currentPrices[company] = Math.max(1000, newPrice);
                 
-                const changeText = changePercent > 0 ? `+${changePercent.toFixed(1)}` : changePercent.toFixed(1);
-                const effectType = isPositive ? '📈 호재' : '📉 악재';
+                const changeText = changePercent > 0 ? `+${changePercent}` : `${changePercent}`;
+                const effectType = changePercent > 0 ? '📈 호재' : '📉 악재';
                 
-                showMessage(`${company}: ${oldPrice.toLocaleString()}원 → ${newPrice.toLocaleString()}원 (${changeText}%) ${effectType}`, 'success');
+                showMessage(`${company}: ${oldPrice.toLocaleString()}원 → ${gameState.currentPrices[company].toLocaleString()}원 (${changeText}%) ${effectType}`, 'success');
             });
         }
         
