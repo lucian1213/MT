@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>엔젤코인 비밀계좌</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .app-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 380px;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .app-subtitle {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+        }
+
+        .input-container {
+            margin-bottom: 30px;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #34495e;
+            margin-bottom: 8px;
+            text-align: left;
+        }
+
+        .code-input {
+            width: 100%;
+            height: 56px;
+            border: 2px solid #e1e8ed;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
+            letter-spacing: 8px;
+            text-transform: uppercase;
+            background: #f8f9fa;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .code-input:focus {
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .code-input.error {
+            border-color: #e74c3c;
+            background: #fdf2f2;
+            animation: shake 0.5s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 20%, 40%, 60%, 80% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+        }
+
+        .login-btn {
+            width: 100%;
+            height: 56px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-btn:active {
+            transform: translateY(0);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .error-message.show {
+            opacity: 1;
+        }
+
+        .success-screen {
+            display: none;
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .success-screen.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            border-radius: 50%;
+            margin: 0 auto 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+        }
+
+        .success-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .success-message {
+            font-size: 16px;
+            color: #00b894;
+            font-weight: 600;
+            line-height: 1.5;
+            padding: 20px;
+            background: rgba(0, 184, 148, 0.1);
+            border-radius: 12px;
+            border-left: 4px solid #00b894;
+        }
+
+        .login-screen {
+            transition: all 0.3s ease;
+        }
+
+        .login-screen.hide {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="login-screen" id="loginScreen">
+            <div class="logo">AC</div>
+            <h1 class="app-title">엔젤코인</h1>
+            <p class="app-subtitle">비밀계좌</p>
+            
+            <div class="input-container">
+                <label class="input-label" for="codeInput">접근 코드 (7자리)</label>
+                <input 
+                    type="text" 
+                    id="codeInput" 
+                    class="code-input" 
+                    placeholder="·······"
+                    maxlength="7"
+                    autocomplete="off"
+                >
+                <div class="error-message" id="errorMessage">
+                    🚫 접근이 거부되었습니다. 올바른 코드를 입력해주세요.
+                </div>
+            </div>
+            
+            <button class="login-btn" id="loginBtn">로그인</button>
+        </div>
+
+        <div class="success-screen" id="successScreen">
+            <div class="success-icon">✓</div>
+            <h2 class="success-title">접근 성공!</h2>
+            <div class="success-message">
+                엔딩 조건 중 하나 달성,<br>
+                <strong>손대웅의 비밀 계좌가 발견되었다.</strong>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const codeInput = document.getElementById('codeInput');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const loginScreen = document.getElementById('loginScreen');
+        const successScreen = document.getElementById('successScreen');
+        
+        const correctCode = 'VINCENT';
+        
+        function showError() {
+            codeInput.classList.add('error');
+            errorMessage.classList.add('show');
+            
+            setTimeout(() => {
+                codeInput.classList.remove('error');
+            }, 500);
+            
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 3000);
+        }
+        
+        function showSuccess() {
+            loginScreen.classList.add('hide');
+            successScreen.classList.add('show');
+        }
+        
+        function attemptLogin() {
+            const inputCode = codeInput.value.trim().toUpperCase();
+            
+            if (inputCode === correctCode) {
+                showSuccess();
+            } else {
+                showError();
+                codeInput.value = '';
+            }
+        }
+        
+        loginBtn.addEventListener('click', attemptLogin);
+        
+        codeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                attemptLogin();
+            }
+        });
+        
+        codeInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '');
+        });
+        
+        // 포커스 시 에러 상태 제거
+        codeInput.addEventListener('focus', () => {
+            errorMessage.classList.remove('show');
+            codeInput.classList.remove('error');
+        });
+    </script>
+</body>
+</html>
