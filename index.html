@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사업자 등록번호 조회</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Malgun Gothic', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .business-input {
+            width: 90px;
+            height: 50px;
+            border: 2px solid #e1e5e9;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            transition: all 0.3s ease;
+        }
+
+        .business-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .business-input.last {
+            width: 120px;
+        }
+
+        .separator {
+            font-size: 20px;
+            font-weight: bold;
+            color: #999;
+        }
+
+        .search-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .search-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .search-button:active {
+            transform: translateY(0);
+        }
+
+        .result-container {
+            margin-top: 30px;
+            padding: 20px;
+            background: #fdf2f2;
+            border-radius: 10px;
+            border-left: 4px solid #e74c3c;
+            display: none;
+        }
+
+        .result-container.show {
+            display: block;
+        }
+
+        .result-text {
+            color: #333;
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .success-page {
+            display: none;
+        }
+
+        .success-page.show {
+            display: block;
+        }
+
+        .success-content {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .success-title {
+            margin-bottom: 15px;
+            font-size: 24px;
+        }
+
+        .success-info {
+            font-size: 18px;
+            line-height: 1.6;
+        }
+
+        .back-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px 20px;
+            }
+            
+            .title {
+                font-size: 24px;
+            }
+            
+            .input-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .separator {
+                display: none;
+            }
+            
+            .business-input, .business-input.last {
+                width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="inputForm">
+            <h1 class="title">사업자 등록번호 조회</h1>
+            <p class="subtitle">사업자 등록번호를 입력하여 조회하세요</p>
+            
+            <form id="businessForm">
+                <div class="form-group">
+                    <label class="form-label">사업자등록번호를 입력하세요</label>
+                    <div class="input-container">
+                        <input type="text" class="business-input" id="first" maxlength="3" placeholder="000">
+                        <span class="separator">-</span>
+                        <input type="text" class="business-input" id="second" maxlength="3" placeholder="000">
+                        <span class="separator">-</span>
+                        <input type="text" class="business-input last" id="third" maxlength="5" placeholder="00000">
+                    </div>
+                </div>
+                
+                <button type="submit" class="search-button">조회하기</button>
+            </form>
+            
+            <div class="result-container" id="resultContainer">
+                <div class="result-text" id="resultText"></div>
+            </div>
+        </div>
+
+        <div class="success-page" id="successPage">
+            <h1 class="title">조회 성공!</h1>
+            <div class="success-content">
+                <h2 class="success-title">✅ 사업자 정보 확인됨</h2>
+                <p class="success-info">
+                    사업자등록번호: <strong>229-143-51420</strong><br>
+                    상태: 정상 등록<br>
+                    조회일시: <span id="queryTime"></span>
+                </p>
+            </div>
+            
+            <div style="background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 10px; padding: 25px; margin: 20px 0; text-align: left; line-height: 1.8;">
+                <p style="color: #495057; font-size: 16px; margin: 0;">
+                    사업자 등록번호를 조회한 결과, 사업장이 국내가 아닌 해외로 되어 있다. 놀랍게도 이곳의 주소지는 <strong style="color: #dc3545;">[엔젤 코인]</strong>을 운영하고 있는 회사와 사업장이 같았다. 이건 아무래도 실제하는 기업이 아닌 <strong style="color: #dc3545;">페이퍼 컴퍼니</strong>일 가능성이 높다. 한기자는 엔젤 코인과 사랑의 날개에 대해 조사한 걸까? 이건 뭘 의미하는 것일까?
+                </p>
+            </div>
+            
+            <button class="back-button" onclick="goBack()">다시 조회하기</button>
+        </div>
+    </div>
+
+    <script>
+        // 숫자만 입력 가능하도록 제한
+        function restrictToNumbers(input) {
+            input.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '');
+            });
+        }
+
+        // 자동 포커스 이동
+        function autoFocusNext(current, next) {
+            current.addEventListener('input', function() {
+                if (this.value.length === parseInt(this.getAttribute('maxlength'))) {
+                    if (next) {
+                        next.focus();
+                    }
+                }
+            });
+        }
+
+        // 백스페이스로 이전 필드로 이동
+        function handleBackspace(current, prev) {
+            current.addEventListener('keydown', function(e) {
+                if (e.key === 'Backspace' && this.value === '' && prev) {
+                    prev.focus();
+                }
+            });
+        }
+
+        // 입력 필드 설정
+        const firstInput = document.getElementById('first');
+        const secondInput = document.getElementById('second');
+        const thirdInput = document.getElementById('third');
+
+        // 숫자만 입력 가능
+        [firstInput, secondInput, thirdInput].forEach(restrictToNumbers);
+
+        // 자동 포커스 이동
+        autoFocusNext(firstInput, secondInput);
+        autoFocusNext(secondInput, thirdInput);
+
+        // 백스페이스 처리
+        handleBackspace(secondInput, firstInput);
+        handleBackspace(thirdInput, secondInput);
+
+        // 폼 제출 처리
+        document.getElementById('businessForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const first = firstInput.value;
+            const second = secondInput.value;
+            const third = thirdInput.value;
+            
+            // 입력 형식 검증
+            if (first.length !== 3 || second.length !== 3 || third.length !== 5) {
+                showResult('올바른 형식으로 입력해주세요. (000-000-00000)');
+                return;
+            }
+            
+            // 특정 번호 확인
+            if (first === '229' && second === '143' && third === '51420') {
+                showSuccessPage();
+            } else {
+                const formattedNumber = `${first}-${second}-${third}`;
+                showResult(`입력하신 사업자등록번호 ${formattedNumber}가 잘못 입력되었습니다.`);
+            }
+        });
+
+        function showResult(message) {
+            const resultContainer = document.getElementById('resultContainer');
+            const resultText = document.getElementById('resultText');
+            
+            resultText.textContent = message;
+            resultContainer.className = 'result-container show';
+        }
+
+        function showSuccessPage() {
+            document.getElementById('inputForm').style.display = 'none';
+            document.getElementById('successPage').className = 'success-page show';
+            document.getElementById('queryTime').textContent = new Date().toLocaleString('ko-KR');
+        }
+
+        function goBack() {
+            document.getElementById('inputForm').style.display = 'block';
+            document.getElementById('successPage').className = 'success-page';
+            document.getElementById('resultContainer').className = 'result-container';
+            
+            // 입력 필드 초기화
+            firstInput.value = '';
+            secondInput.value = '';
+            thirdInput.value = '';
+            firstInput.focus();
+        }
+    </script>
+</body>
+</html>
